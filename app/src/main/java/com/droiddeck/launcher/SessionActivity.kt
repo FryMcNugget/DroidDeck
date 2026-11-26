@@ -1236,6 +1236,8 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback, com.droidde
                 if (!drawerOpen && !pcKeyboardOpen && !loading.visible) {
                     com.droiddeck.launcher.ui.DrawerEntryHint(SessionState.mode == SessionService.MODE_STEAM, backActionsInverted) { drawerOpen = true }
                     if (cornerTap) com.droiddeck.launcher.ui.DrawerCornerTap { drawerOpen = true }
+                    if (com.droiddeck.launcher.session.QuestExperimental.isSupported())
+                        com.droiddeck.launcher.ui.DrawerEdgeSwipe { routeBackAction() }
                 }
                 if (loading.visible) LoadingOverlay(
                     loading.step, loading.percent, loading.elapsed, loading.hint, loading.ended,

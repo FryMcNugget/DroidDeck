@@ -7,15 +7,18 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -87,6 +91,27 @@ internal fun DrawerEntryHint(steam: Boolean, inverted: Boolean, onOpen: () -> Un
                 )
             }
         }
+    }
+}
+
+/** A Quest has no system Back gesture, so a laser drag in from the right edge stands in for it. */
+@Composable
+internal fun DrawerEdgeSwipe(onBack: () -> Unit) {
+    val threshold = with(LocalDensity.current) { 48.dp.toPx() }
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        Box(
+            Modifier.fillMaxHeight().width(16.dp).testTag("drawer-edge")
+                .pointerInput(Unit) {
+                    var travelled = 0f
+                    detectHorizontalDragGestures(
+                        onDragStart = { travelled = 0f },
+                        onDragEnd = { if (travelled <= -threshold) onBack() },
+                    ) { change, amount ->
+                        change.consume()
+                        travelled += amount
+                    }
+                },
+        )
     }
 }
 
